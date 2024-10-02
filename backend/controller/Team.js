@@ -8,6 +8,9 @@ export const createTeam = async (req, res) => {
         const { team_name } = req.body;
         const userId = req.user._id;
         const user = await User.findById(userId);
+        if (team_name.trim() == '') {
+            return res.status(403).json({message: "Team name cannot be empty."});
+        }
         if (user.team_id) {
             return res.status(400).json({message: "You are already part of a team."});
         }
@@ -40,6 +43,9 @@ export const joinTeam = async (req, res) => {
         const { team_id } = req.body;
         const userId = req.user._id;
         const user = await User.findById(userId);
+        if (team_id.trim() == '') {
+            return res.status(403).json({message: "Team Code cannot be empty."});
+        }
         if (user.team_id) {
             return res.status(400).json({message: "You are already in a team."});
         }
@@ -68,6 +74,9 @@ export const submitIdea = async (req, res) => {
         const { idea } = req.body;
         const userId = req.user.id;
         const user = await User.findById(userId).populate('team_id');
+        if (idea.trim() == '') {
+            return res.status(403).json({message: "Idea cannot be empty."});
+        }
         if (!user || !user.team_id) {
             return res.status(404).json({message: "User not part of any team."});
         }
@@ -77,9 +86,6 @@ export const submitIdea = async (req, res) => {
         }
         if (!team.is_editable) {
             return res.status(403).json({message: "Idea submission is no longer editable."});
-        }
-        if (idea.trim() == '') {
-            return res.status(403).json({message: "Idea cannot be empty."});
         }
         team.idea = idea;
         team.submission_time = new Date();
